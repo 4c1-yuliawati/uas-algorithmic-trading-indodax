@@ -1,0 +1,1 @@
+Place raw 4-hour Indodax history CSV files here. Generate them with `npm run download` (public API only). Files are excluded from Git by default; include the exact historical dataset used for the submitted backtest in the final ZIP if size permits, with source and retrieval timestamp recorded in the manifest.

@@ -1,0 +1,17 @@
+name: Indodax dry-run hourly trigger
+on:
+  schedule:
+    - cron: '7 */4 * * *'
+  workflow_dispatch:
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Vercel bot endpoint
+        env:
+          BOT_URL: ${{ secrets.BOT_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          test -n "$BOT_URL" && test -n "$CRON_SECRET"
+          curl --fail-with-body --silent --show-error -X POST "$BOT_URL/api/tick" \
+            -H "Authorization: Bearer $CRON_SECRET" -H 'Content-Type: application/json'

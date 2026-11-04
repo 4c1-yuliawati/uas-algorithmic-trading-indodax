@@ -1,0 +1,1 @@
+Reference artifacts from the prior UTS project. The original AFL is retained as the strategy source. The UTS HTML dashboard is included only as visual/history reference; it is not the Indodax bot, does not contain verified 4-hour crypto data, and must not be treated as UAS forward-test evidence.

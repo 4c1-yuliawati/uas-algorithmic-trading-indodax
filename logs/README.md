@@ -1,0 +1,1 @@
+No forward-test logs are included in this initial package because no verified bot run has yet been performed. Do not create or fabricate placeholder trades. After deployment, export the actual Redis log response from GET /api/dashboard to `forward_logs.json`; preserve it unchanged. Keep hourly/preparation snapshots in `orderbook_snapshots.jsonl`.
