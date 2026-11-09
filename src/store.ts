@@ -5,14 +5,14 @@ let redis: Redis | undefined;
 
 export function db() {
   const url = (
-    process.env.UPSTASH_REDIS_REST_URL ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL
-  )?.trim();
+  process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ||
+  process.env.UPSTASH_REDIS_REST_URL
+)?.trim();
 
-  const token = (
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN
-  )?.trim();
+const token = (
+  process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
+  process.env.UPSTASH_REDIS_REST_TOKEN
+)?.trim();
 
   if (!url || !token) {
     throw new Error('UPSTASH_REDIS_ENV_MISSING');
