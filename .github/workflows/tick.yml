@@ -1,9 +1,22 @@
 name: tick
 on:
-  schedule: [{cron: "7 * * * *"}]   # tiap jam menit ke-7 (hindari menit 0). Idempotency: 1 candle = 1 eksekusi
+  schedule:
+    - cron: "7 * * * *"   # tiap jam menit ke-7 (hindari menit 0). Idempotency: 1 candle = 1 eksekusi
   workflow_dispatch:
 jobs:
   call:
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sS --max-time 290 --retry 2 -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" "${{ secrets.BOT_URL }}/api/tick"
+      - name: Panggil /api/tick
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          BOT_URL: ${{ secrets.BOT_URL }}
+          BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: |
+          set -e
+          curl -sS --max-time 290 --retry 2 \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "x-vercel-protection-bypass: ${BYPASS}" \
+            "${BOT_URL}/api/tick" | tee out.json
+          echo
+          grep -q '"status"' out.json
