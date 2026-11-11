@@ -42,17 +42,18 @@ def run():
     elif redis("SET", f"lock:{cand}", str(t_call), "NX", "EX", 900) is None: rec["status"] = "LOCKED"
     else:
         try:
-            process(st, cand, now, books, eq, blocked, t_call)
-            redis("SET", f"done:{cand}", str(t_call)); rec.update(processed_ts=int(time.time()), status="PROCESSED")
+            nbad = process(st, cand, now, books, eq, blocked, t_call)
+            if nbad: redis("DEL", f"lock:{cand}"); rec.update(processed_ts=int(time.time()), status="PARTIAL_RETRY")   # tick berikutnya mencoba pair yang gagal
+            else: redis("SET", f"done:{cand}", str(t_call)); rec.update(processed_ts=int(time.time()), status="PROCESSED")
         except Exception as e:
             err("PROCESS", e, candle_ts=cand); redis("DEL", f"lock:{cand}"); rec["status"] = "ERROR"   # panggilan berikutnya mencoba lagi
     redis("SET", "state", json.dumps(st)); log("calls", rec); return {**out, **rec}
 
 def process(st, cand, now, books, eq, blocked, t_call):
-    done = st["handled"].setdefault(str(cand), [])
+    done = st["handled"].setdefault(str(cand), []); bad = []
     for p in U:
         if p in done: continue
-        c4 = candles_4h(p, now); bars = bars_12h(c4, TF); time.sleep(0.3)
+        c4 = candles_4h(p, now); bars = [b for b in bars_12h(c4, TF) if b[0] + TF <= now]; time.sleep(0.3)
         why = None
         if not bars or bars[-1][0] != cand or not bars[-1][2]: why = "candle tertutup terakhir tidak ada/lebih tua dari 2xTF"
         elif len(bars) < 260: why = "riwayat < 260 bar"
@@ -73,8 +74,10 @@ def process(st, cand, now, books, eq, blocked, t_call):
             if blocked: err("BUY_DITOLAK", "daily loss limit aktif", pair=p)
             elif len(st["pos"]) >= CFG["max_positions"]: err("BUY_DITOLAK", "batas posisi terbuka", pair=p)
             else: buy(st, p, b, a, c, cand, eq)
+        if why: bad.append(p); continue   # data belum valid -> dicoba lagi pada tick berikutnya (candle sama)
         done.append(p); redis("SET", "state", json.dumps(st))   # simpan per pair -> aman bila terpotong
     for p in [p for p, q in st["pos"].items() if q.get("exit_pending") and p not in done]: sell(st, p, *books.get(p, ([], [])), None, cand)
+    return len(bad)
 
 def order(p, side, qty, b, a, fill, fee, sp, cand):
     log("orders", dict(ts=int(time.time()), pair=p, side=side, qty=qty, best_bid=b[0][0], best_ask=a[0][0], fill=fill, fee=fee, signal_price=sp, candle_ts=cand))
