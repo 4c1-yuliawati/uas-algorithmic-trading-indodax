@@ -1,3 +1,5 @@
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import json
 from http.server import BaseHTTPRequestHandler
 from _core import *

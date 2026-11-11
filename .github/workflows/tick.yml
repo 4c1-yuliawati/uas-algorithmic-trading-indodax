@@ -6,4 +6,4 @@ jobs:
   call:
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sS --max-time 290 --retry 2 -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ secrets.BOT_URL }}/api/tick"
+      - run: curl -sS --max-time 290 --retry 2 -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" "${{ secrets.BOT_URL }}/api/tick"
