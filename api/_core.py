@@ -28,7 +28,9 @@ def authorized(headers):
     return bool(s) and hmac.compare_digest(headers.get("authorization", headers.get("Authorization", "")), "Bearer " + s)
 
 def server_time():
-    d = http_json(BASE + "/api/server_time"); return int(d["server_time"] if isinstance(d, dict) else d)
+    """Indodax mengirim server_time dalam MILIDETIK (mis. 1794415289854); kembalikan detik."""
+    d = http_json(BASE + "/api/server_time"); v = int(float(d["server_time"] if isinstance(d, dict) else d))
+    return v // 1000 if v > 10**11 else v
 def depth(pair):
     d = http_json(f"{BASE}/api/depth/{pair}")
     bids = [(float(p), float(q)) for p, q in d.get("buy", [])]; asks = [(float(p), float(q)) for p, q in d.get("sell", [])]

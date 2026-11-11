@@ -48,3 +48,10 @@ print(f"panggilan {len(L['calls'])}, diproses {proc}, duplikat dilewati {dup}; s
 assert bad == 0, "sinyal bot != strategi langsung"; assert len({c["candle_ts"] for c in L["calls"] if c["status"] == "PROCESSED"}) == proc, "candle diproses >1x"
 for o in L["orders"]: assert o["fill"] >= o["best_ask"] - 1e-6 if o["side"] == "BUY" else o["fill"] <= o["best_bid"] + 1e-6, "fill di luar bid/ask"
 print("LOLOS")
+
+# format server_time Indodax (milidetik) harus dikonversi ke detik
+_real = _core.http_json
+_core.http_json = lambda *a, **k: {"timezone": "UTC", "server_time": 1794415289854}
+assert _core.server_time() == 1794415289, "server_time milidetik tidak dikonversi"
+_core.http_json = _real
+print("uji format server_time (milidetik): LOLOS")
