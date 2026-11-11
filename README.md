@@ -32,6 +32,9 @@ Bot **dry run**: order simulasi, tanpa uang, tanpa API key Indodax. Hanya API pu
 ## Uji offline (tanpa internet)
 `python tests/sim_bot.py` — Redis & Indodax tiruan; membuktikan sinyal bot identik dengan backtest candle demi candle, panggilan ganda tidak membeli dua kali, fill di bid/ask.
 
+## Konektivitas Indodax dari Vercel (temuan uji koneksi, 11 Nov 2026)
+Endpoint publik `/api/diag` menguji server_time, depth, history_v2 dan pairs dari fungsi Vercel. Hasil: Cloudflare Indodax membalas **403** bila User-Agent berupa klien bot/Python bawaan, dan **200** dengan data asli bila memakai User-Agent browser standar. Bot memakai User-Agent browser (`api/_core.py`), tetap memakai API publik tanpa API key dan dalam batas laju (<=3 request/detik).
+
 ## Catatan jujur
 - Spread/slippage backtest sebelum freeze = ukuran snapshot yang terkumpul; bandingkan dengan seluruh snapshot di refleksi.
 - Penjadwal GitHub Actions bisa terlambat; sinyal tetap dari candle tertutup, harga fill bergeser — dibahas di refleksi dan diukur lewat `calls.csv`.
