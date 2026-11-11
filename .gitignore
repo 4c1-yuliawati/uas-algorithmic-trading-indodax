@@ -1,12 +1,7 @@
-node_modules/
-.next/
 .env
-.env.local
+.env.*
+!.env.example
+__pycache__/
 .vercel/
-.DS_Store
-*.log
-logs/*.jsonl
-logs/*.csv
-!logs/.gitkeep
-data/raw/*.csv
-!data/raw/README.md
+*.pyc
+node_modules/

@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bot Dry Run Indodax | Backtest vs Forward Test</title>
+<style>:root{--bg:#080D16;--card:#111B2B;--el:#172235;--acc:#4F8CFF;--c2:#22D3EE;--pos:#00D6A0;--neg:#FF5C75;--warn:#F5B942;--tx:#EAF0FA;--t2:#8A9BB5;--bd:#243249}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 system-ui,sans-serif;font-variant-numeric:tabular-nums}
+header{position:sticky;top:0;z-index:5;background:#080d16ee;border-bottom:1px solid var(--bd);padding:10px 20px}
+header b{font-size:16px}header span{color:var(--t2);font-size:12px;margin-left:12px}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}nav a{padding:5px 12px;border:1px solid var(--bd);border-radius:8px;color:var(--t2);cursor:pointer;font-size:13px}nav a.on{background:var(--acc);border-color:var(--acc);color:#fff}
+main{padding:20px;max-width:1300px;margin:auto}h1{font-size:20px;margin:0 0 4px}.sub{color:var(--t2);margin:0 0 14px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;min-width:0;margin-bottom:12px}
+.l{color:var(--t2);font-size:11px;text-transform:uppercase;letter-spacing:.05em}.v{font-size:22px;font-weight:700}.s{color:var(--t2);font-size:11px}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.mut{color:var(--t2)}.box{border-left:3px solid var(--warn);background:#16140c;padding:10px 14px;border-radius:6px;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:12.5px}th,td{padding:6px 9px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}th{color:var(--t2);font-size:11px;text-transform:uppercase}.tw{overflow:auto;max-height:520px}
+.lg span{margin-right:14px;font-size:12px;color:var(--t2)}svg text{fill:var(--t2);font-size:11px}code{background:var(--el);padding:1px 5px;border-radius:4px}@media print{header nav{display:none}}</style></head>
+<body><header><b>Bot Dry Run Indodax</b><span id="meta"></span><nav id="nav"></nav></header><main id="v"></main>
+<script id="D" type="application/json">/*__DATA__*/null</script>
+<script>"use strict";
+const D=JSON.parse(document.getElementById("D").textContent),$=s=>document.querySelector(s);
+const nf=(n,d=2)=>n==null||isNaN(n)?"—":Number(n).toLocaleString("id-ID",{minimumFractionDigits:d,maximumFractionDigits:d});
+const pc=n=>n==null?"—":nf(n*100)+"%",idr=n=>n==null?"—":(n<0?"-":"")+"Rp"+Math.abs(Math.round(n)).toLocaleString("id-ID");
+const sg=v=>v>0?"pos":v<0?"neg":"",esc=s=>String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const kpi=(l,v,s,c="")=>`<div class="card"><div class="l">${l}</div><div class="v ${c}">${v}</div><div class="s">${s||""}</div></div>`;
+const ts=u=>u==null?"—":new Date(u*1000).toLocaleString("id-ID",{timeZone:"Asia/Jakarta",hour12:false})+" WIB";
+const {bt,btw,fw,cfg}=D,E=x=>x.eq||{},T=x=>x.tr||{};
+$("#meta").textContent=`${cfg.strategy_name||"Strategi"} · ${(cfg.universe||[]).join(", ")} · TF ${cfg.tf_sec/3600} jam · freeze ${cfg.freeze_commit||"—"} · dihitung ${D.generated}`;
+const noData=!Object.keys(E(fw)).length&&!(D.orders||[]).length;
+function line(series,h=300){const all=series.flatMap(s=>s.p);if(all.length<2)return'<p class="mut">Belum ada data.</p>';
+ const W=900,m={l:70,r:10,t:8,b:22},x=all.map(p=>+new Date(p[0])),y=all.map(p=>p[1]),x0=Math.min(...x),x1=Math.max(...x);let a=Math.min(...y),b=Math.max(...y);if(a==b){a-=1;b+=1}
+ const X=t=>m.l+(t-x0)/((x1-x0)||1)*(W-m.l-m.r),Y=v=>m.t+(1-(v-a)/(b-a))*(h-m.t-m.b);let g=`<svg viewBox="0 0 ${W} ${h}" width="100%">`;
+ for(let k=0;k<=4;k++){const v=a+(b-a)*k/4;g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="#243249"/><text x="${m.l-5}" y="${Y(v)+4}" text-anchor="end">${nf(v,1)}</text>`}
+ g+=`<text x="${m.l}" y="${h-5}">${new Date(x0).toISOString().slice(0,10)}</text><text x="${W-m.r}" y="${h-5}" text-anchor="end">${new Date(x1).toISOString().slice(0,10)}</text>`;
+ series.forEach(s=>{if(s.p.length>1)g+=`<path fill="none" stroke="${s.c}" stroke-width="1.8" ${s.d?'stroke-dasharray="5 4"':""} d="${s.p.map((p,i)=>(i?"L":"M")+X(+new Date(p[0])).toFixed(1)+","+Y(p[1]).toFixed(1)).join("")}"/>`});
+ return`<div class="lg">${series.map(s=>`<span><b style="color:${s.c}">●</b> ${s.n}</span>`).join("")}</div>`+g+"</svg>"}
+const rebase=(p,cap)=>p.length?p.map(q=>[q[0],q[1]/p[0][1]*cap]):[];
+const fillsHtml=()=>{const f=D.fills||{rows:[]};return`<h2 style="font-size:15px">Selisih fill forward vs backtest (jendela sama)</h2><p class="sub">Trade forward ${f.n_fw??0} · trade backtest ${f.n_bt??0} · cocok ${f.rows.length}. Selisih positif pada entry = forward membeli lebih mahal.</p>
+<div class="card tw"><table><tr><th>Pair</th><th>Entry</th><th>Selisih fill entry</th><th>Selisih fill exit</th><th>Keterlambatan</th></tr>${f.rows.map(r=>`<tr><td>${esc(r.pair)}</td><td>${ts(r.entry_ts)}</td><td>${nf(r.entry_diff_pct,3)}%</td><td>${nf(r.exit_diff_pct,3)}%</td><td>${nf(r.delay_min,1)} mnt</td></tr>`).join("")||'<tr><td colspan="5" class="mut">Belum ada trade yang bisa dipasangkan.</td></tr>'}</table></div>`};
+const P={
+overview(){const row=(l,f)=>`<tr><td>${l}</td><td>${f(bt)}</td><td>${f(btw)}</td><td>${f(fw)}</td></tr>`,t=(x,k,f=nf)=>T(x)[k]==null?"—":f(T(x)[k]),e=(x,k,f=pc)=>E(x)[k]==null?"—":f(E(x)[k]);
+ const gap=E(btw).ret!=null&&E(fw).ret!=null?E(fw).ret-E(btw).ret:null;
+ return`<h1>Backtest vs Forward Test</h1><p class="sub">Semua angka dihitung ulang dari log mentah oleh <code>hitung_ulang.py</code>. Forward ${cfg.fwd_start} → ${cfg.fwd_end}.</p>
+ ${noData?'<div class="box">Belum ada log forward test di <code>data/</code>. Jalankan <code>python hitung_ulang.py</code> setelah log diekspor. Tidak ada angka contoh yang ditampilkan.</div>':""}
+ <div class="grid">${kpi("Return forward",e(fw,"ret"),"MDD "+e(fw,"mdd"),sg(E(fw).ret))}${kpi("Return backtest (jendela sama)",e(btw,"ret"),"MDD "+e(btw,"mdd"),sg(E(btw).ret))}
+ ${kpi("Gap forward − backtest",gap==null?"—":nf(gap*100)+" pp","jendela 10 hari yang sama",sg(gap))}${kpi("Buy & hold BTC/IDR",pc((fw.bh||{}).ret),"periode forward")}
+ ${kpi("Kecocokan sinyal",D.sig.match==null?"—":pc(D.sig.match),(D.sig.n||0)+" sinyal dibandingkan")}${kpi("Uptime",pc((D.up||{}).uptime),((D.up||{}).ontime??"—")+" / "+((D.up||{}).expected??"—")+" candle")}</div>
+ <div class="card tw"><table><tr><th>Metrik</th><th>Backtest penuh (${(bt.eq||{}).days?nf(bt.eq.days/365.25,1)+" th":"—"})</th><th>Backtest jendela forward</th><th>Forward test</th></tr>
+ ${row("Return total",x=>e(x,"ret"))}${row("CAGR (hanya backtest penuh)",x=>x===bt?e(x,"cagr"):"tidak ditampilkan")}${row("Max drawdown",x=>e(x,"mdd"))}
+ ${row("Jumlah trade",x=>t(x,"n",v=>nf(v,0)))}${row("Win rate",x=>t(x,"win_rate",pc))}${row("Rata-rata untung / trade",x=>t(x,"avg_win",idr))}${row("Rata-rata rugi / trade",x=>t(x,"avg_loss",idr))}
+ ${row("Profit factor",x=>t(x,"pf"))}${row("Biaya (fee+spread+slippage)",x=>T(x).n?idr(T(x).fee+T(x).spread+T(x).slip):"—")}${row("Porsi biaya ÷ laba kotor",x=>t(x,"cost_share",pc))}</table>
+ <p class="s">Laba kotor = P&L bersih + fee + spread + slippage. Porsi biaya "—" bila laba kotor ≤ 0 atau tidak ada trade.</p></div>`},
+equity(){const S=D.series,cap=cfg.capital||1e8,b=D.btc.filter(q=>q[0]>=cfg.fwd_start.slice(0,10));
+ return`<h1>Equity</h1><p class="sub">Forward dan backtest (jendela sama) dalam Rupiah; BTC buy & hold dinormalisasi ke modal awal.</p><div class="card">${line([{n:"Forward (nilai pada best bid)",c:"#4F8CFF",p:S.fw||[]},{n:"Backtest jendela forward",c:"#F5B942",p:S.btw||[],d:1},{n:"BTC/IDR buy & hold",c:"#22D3EE",p:rebase(b,cap),d:1}])}</div>
+ <h2 style="font-size:15px">Backtest penuh</h2><div class="card">${line([{n:"Backtest",c:"#00D6A0",p:S.bt||[]},{n:"BTC/IDR buy & hold",c:"#22D3EE",p:rebase(D.btc.filter(q=>S.bt&&q[0]>=S.bt[0][0]),cap),d:1}])}</div>`},
+trade(){const o=D.orders||[];return`<h1>Order Simulasi</h1><p class="sub">${o.length} order. Fill = bid/ask live (bukan mid/close); deviasi terhadap harga sinyal.</p><div class="card tw"><table><tr><th>Waktu</th><th>Pair</th><th>Sisi</th><th>Qty</th><th>Bid</th><th>Ask</th><th>Fill rata-rata</th><th>Fee</th><th>Harga sinyal</th><th>Deviasi</th></tr>
+ ${o.map(x=>`<tr><td>${ts(x.ts)}</td><td>${esc(x.pair)}</td><td>${x.side}</td><td>${nf(x.qty,8)}</td><td>${nf(x.best_bid,0)}</td><td>${nf(x.best_ask,0)}</td><td>${nf(x.fill,0)}</td><td>${idr(x.fee)}</td><td>${nf(x.signal_price,0)}</td><td class="${x.dev_pct>0?"neg":""}">${nf(x.dev_pct,3)}%</td></tr>`).join("")||'<tr><td colspan="10" class="mut">Tidak ada order (0 trade valid bila sinyal cocok).</td></tr>'}</table></div>`},
+sinyal(){return P._s()+fillsHtml()},
+_s(){const s=D.sig;return`<h1>Kecocokan Sinyal</h1><p class="sub">Backtest dijalankan ulang pada candle forward yang sama; target 100%.</p>${s.n?`<div class="grid">${kpi("Kecocokan",pc(s.match),s.n+" pasangan candle×pair")}${kpi("Selisih",(s.beda||[]).length,"baris tidak cocok",(s.beda||[]).length?"neg":"pos")}</div>
+ <div class="card tw"><table><tr><th>Candle</th><th>Pair</th><th>Backtest</th><th>Forward</th></tr>${(s.beda||[]).map(r=>`<tr><td>${ts(r.candle_ts)}</td><td>${esc(r.pair)}</td><td>${esc(r.signal_bt)}</td><td>${esc(r.signal_fw)}</td></tr>`).join("")}</table></div>`:'<div class="box">Butuh <code>signals_forward.csv</code> dan <code>signals_backtest_window.csv</code>.</div>'}`},
+ops(){const u=D.up||{};return`<h1>Operasional</h1><p class="sub">Uptime = candle terproses sebelum candle berikutnya ditutup ÷ jumlah candle forward.</p><div class="grid">${kpi("Uptime",pc(u.uptime),(u.ontime??"—")+" dari "+(u.expected??"—")+" candle")}${kpi("Panggilan tercatat",u.calls??"—","")}
+ ${kpi("Terlambat (median / maks)",u.late_med_min==null?"—":nf(u.late_med_min,1)+" / "+nf(u.late_max_min,1)+" mnt","setelah candle tutup")}${kpi("Error API",D.n_err,"baris errors.csv",D.n_err?"neg":"pos")}${kpi("Kill switch",(D.kill||[]).length,"pemakaian tercatat")}</div>
+ <div class="card tw"><h3 class="l">Error terakhir</h3><table><tr><th>Waktu</th><th>Jenis</th><th>Pesan</th></tr>${(D.errors||[]).map(r=>`<tr><td>${ts(r.ts)}</td><td>${esc(r.type)}</td><td style="text-align:left">${esc(r.msg)}</td></tr>`).join("")||'<tr><td colspan="3" class="mut">Tidak ada error.</td></tr>'}</table></div>
+ <div class="card tw"><h3 class="l">Kill switch</h3><table><tr><th>Waktu</th><th>Aksi</th></tr>${(D.kill||[]).map(r=>`<tr><td>${ts(r.ts)}</td><td>${esc(r.action)}</td></tr>`).join("")||'<tr><td colspan="2" class="mut">Tidak dipakai.</td></tr>'}</table></div>`},
+biaya(){const s=D.spr,f=cfg.fee_sources||[];return`<h1>Biaya & Spread</h1><p class="sub">Fee taker memakai sumber yang lebih mahal; spread backtest dibandingkan seluruh snapshot order book.</p>
+ <div class="card tw"><table><tr><th>Sumber fee</th><th>Tarif</th><th>Diakses</th></tr>${f.map(r=>`<tr><td style="text-align:left">${esc(r.url)}</td><td>${nf(r.pct,3)}%</td><td>${esc(r.accessed)}</td></tr>`).join("")||'<tr><td colspan="3" class="mut">Isi cfg.fee_sources.</td></tr>'}</table><p class="s">Dipakai: beli ${cfg.fee_buy_pct??"—"}% · jual ${cfg.fee_sell_pct??"—"}% (${esc(cfg.fee_status||"")}) · spread backtest ${cfg.backtest_spread_pct??"—"}% + slippage ${cfg.backtest_slip_pct??"—"}% (${esc(cfg.spread_status||"")}) · minimum order Rp${nf(cfg.min_order,0)}</p></div>
+ ${s.n?`<div class="grid">${kpi("Spread median (semua snapshot)",nf(s.median_all,3)+"%",s.n+" snapshot")}${kpi("Spread asumsi backtest",s.assumed_bt==null?"—":nf(s.assumed_bt,3)+"%","selisih "+(s.assumed_bt==null?"—":nf(s.median_all-s.assumed_bt,3)+" pp"))}</div>
+ <div class="card tw"><table><tr><th>Pair</th><th>Spread median</th></tr>${Object.entries(s.per_pair).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${nf(v,3)}%</td></tr>`).join("")}</table></div>`:'<div class="box">Butuh <code>snapshots.csv</code>.</div>'}`}};
+const names={overview:"Overview",equity:"Equity",trade:"Order",sinyal:"Sinyal",ops:"Operasional",biaya:"Biaya & Spread"};
+$("#nav").innerHTML=Object.entries(names).map(([k,v])=>`<a data-k="${k}">${v}</a>`).join("");
+function go(){const k=P[location.hash.slice(1)]?location.hash.slice(1):"overview";document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("on",a.dataset.k==k));$("#v").innerHTML=P[k]()}
+$("#nav").onclick=e=>{if(e.target.dataset.k)location.hash=e.target.dataset.k};addEventListener("hashchange",go);go();
+</script></body></html>

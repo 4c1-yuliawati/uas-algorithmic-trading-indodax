@@ -1,0 +1,9 @@
+name: tick
+on:
+  schedule: [{cron: "7 * * * *"}]   # tiap jam menit ke-7 (hindari menit 0). Idempotency: 1 candle = 1 eksekusi
+  workflow_dispatch:
+jobs:
+  call:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sS --max-time 290 --retry 2 -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ secrets.BOT_URL }}/api/tick"

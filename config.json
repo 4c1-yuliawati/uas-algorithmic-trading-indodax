@@ -1,0 +1,44 @@
+{
+ "strategy_name": "Trend Following EMA20/50/200 + ADX14 (12 jam)",
+ "universe": [
+  "btcidr",
+  "ethidr",
+  "dogeidr",
+  "adaidr",
+  "xrpidr",
+  "bnbidr",
+  "solidr",
+  "trxidr"
+ ],
+ "tf_sec": 43200,
+ "capital": 100000000,
+ "max_positions": 5,
+ "alloc_pct": 20,
+ "daily_loss_limit_pct": 3,
+ "min_order": 25000,
+ "fee_buy_pct": 0.20555,
+ "fee_sell_pct": 0.41555,
+ "fee_status": "Dipakai tarif LEBIH MAHAL: help.indodax.com 'Biaya Trading' taker IDR all-in (PRO) beli 0,20555% / jual 0,41555% (vs /api/pairs 0,2% service saja). Diakses 2026-11-11. Min order Rp25.000 (lebih ketat dari /api/pairs Rp10.000).",
+ "taker_fee_pct": 0.41555,
+ "fee_sources": [
+  {
+   "url": "https://help.indodax.com/hc/id/articles/4416646599705-Rincian-Biaya-Transaksi-di-INDODAX",
+   "pct": 0.41555,
+   "accessed": "2026-11-11"
+  },
+  {
+   "url": "https://indodax.com/api/pairs",
+   "pct": 0.2,
+   "accessed": "2026-11-11",
+   "note": "btcidr: trade_fee_percent_taker=0.2 (service fee saja); trade_min_base_currency=10000; quantity_increment=1e-8"
+  }
+ ],
+ "backtest_spread_pct": 0.2,
+ "backtest_slip_pct": 0.05,
+ "spread_status": "SEMENTARA - ganti dgn median snapshot order book sebelum freeze",
+ "backtest_start": "2022-10-01",
+ "backtest_end": "2026-10-01",
+ "fwd_start": "2026-11-12T12:00:00+07:00",
+ "fwd_end": "2026-11-22T12:00:00+07:00",
+ "freeze_commit": "diisi otomatis dari FREEZE.txt"
+}

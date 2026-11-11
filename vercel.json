@@ -1,1 +1,1 @@
-{"functions":{"app/api/tick/route.ts":{"maxDuration":60}},"crons":[]}
+{"functions":{"api/*.py":{"maxDuration":300,"includeFiles":"{config.json,strategy.py}"}}}
