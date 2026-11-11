@@ -3,5 +3,13 @@
   "buildCommand": null,
   "installCommand": null,
   "outputDirectory": "public",
-  "functions": { "api/*.py": { "maxDuration": 300, "includeFiles": "{config.json,strategy.py}" } }
+  "functions": {
+    "api/*.py": {
+      "maxDuration": 300,
+      "includeFiles": "{config.json,strategy.py}"
+    }
+  },
+  "regions": [
+    "sin1"
+  ]
 }

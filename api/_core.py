@@ -2,7 +2,7 @@
 import os, sys, json, time, hmac, urllib.request, urllib.parse
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT)
 CFG = json.load(open(os.path.join(ROOT, "config.json")))
-BASE = "https://indodax.com"; UA = {"User-Agent": "uas-dryrun-bot/1.0"}
+BASE = "https://indodax.com"; UA = {"User-Agent": "Mozilla/5.0 (compatible; uas-dryrun-bot/1.0; +https://github.com/4c1-yuliawati/uas-algorithmic-trading-indodax)", "Accept": "application/json, text/plain, */*", "Accept-Language": "id-ID,id;q=0.9,en;q=0.8"}
 class ApiError(Exception): pass
 
 def http_json(url, method="GET", body=None, headers=None, tries=3, timeout=10):
