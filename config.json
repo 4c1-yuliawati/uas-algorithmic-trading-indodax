@@ -38,7 +38,7 @@
  "spread_status": "DIUKUR: median spread bid-ask 0.1265% (168 snapshot order book, 21 per pair, 8 pair, 11-12 Nov 2026, /api/status log:snaps) dibulatkan 0.13%. Slippage 0.05% = asumsi (belum ada order forward untuk diukur); dikoreksi di refleksi setelah forward.",
  "backtest_start": "2022-10-01",
  "backtest_end": "2026-10-01",
- "fwd_start": "2026-11-12T12:00:00+07:00",
- "fwd_end": "2026-11-22T12:00:00+07:00",
+ "fwd_start": "2026-11-12T23:00:00+07:00",
+ "fwd_end": "2026-11-22T23:00:00+07:00",
  "freeze_commit": "diisi otomatis dari FREEZE.txt"
 }
