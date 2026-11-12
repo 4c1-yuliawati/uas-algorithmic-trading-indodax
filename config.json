@@ -33,9 +33,9 @@
    "note": "btcidr: trade_fee_percent_taker=0.2 (service fee saja); trade_min_base_currency=10000; quantity_increment=1e-8"
   }
  ],
- "backtest_spread_pct": 0.2,
+ "backtest_spread_pct": 0.13,
  "backtest_slip_pct": 0.05,
- "spread_status": "SEMENTARA - ganti dgn median snapshot order book sebelum freeze",
+ "spread_status": "DIUKUR: median spread bid-ask 0.1265% (168 snapshot order book, 21 per pair, 8 pair, 11-12 Nov 2026, /api/status log:snaps) dibulatkan 0.13%. Slippage 0.05% = asumsi (belum ada order forward untuk diukur); dikoreksi di refleksi setelah forward.",
  "backtest_start": "2022-10-01",
  "backtest_end": "2026-10-01",
  "fwd_start": "2026-11-12T12:00:00+07:00",
