@@ -87,7 +87,9 @@ if not sf.empty and not sb.empty:
 
 # uptime
 cl_ = inwin(rd("calls.csv")); up = {}
-exp = int((pd.Timestamp(cfg["fwd_end"]) - pd.Timestamp(cfg["fwd_start"])).total_seconds() // TF)
+t0 = int(pd.Timestamp(cfg["fwd_start"]).timestamp()); t1 = int(pd.Timestamp(cfg["fwd_end"]).timestamp())
+if not cl_.empty: t1 = min(t1, int(cl_.ts.max()))      # laporan sementara: hanya candle yang sudah sempat tutup sampai log terakhir
+exp = max(0, t1 // TF - t0 // TF)                       # jumlah batas candle 12 jam di (fwd_start, t1]
 if not cl_.empty:
     c = cl_.dropna(subset=["processed_ts"]).sort_values("processed_ts").drop_duplicates("candle_ts")
     c = c[c.processed_ts < c.candle_ts + 2 * TF]

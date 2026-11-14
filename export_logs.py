@@ -2,8 +2,11 @@
 Pakai: BOT_URL=https://<app>.vercel.app CRON_SECRET=... python export_logs.py"""
 import os, csv, json, urllib.request, datetime as dt, pathlib
 D = pathlib.Path(__file__).parent / "data"; D.mkdir(exist_ok=True)
-rq = urllib.request.Request(os.environ["BOT_URL"] + "/api/export", headers={"Authorization": "Bearer " + os.environ["CRON_SECRET"]})
-L = json.load(urllib.request.urlopen(rq, timeout=60))
+if os.environ.get("LOG_FILE"):                              # mode offline: baca log_mentah.json hasil ekspor sebelumnya
+    L = json.load(open(os.environ["LOG_FILE"]))
+else:
+    rq = urllib.request.Request(os.environ["BOT_URL"] + "/api/export", headers={"Authorization": "Bearer " + os.environ["CRON_SECRET"]})
+    L = json.load(urllib.request.urlopen(rq, timeout=60))
 json.dump(L, open(D / "log_mentah.json", "w"))            # arsip mentah utuh (ikut dikumpulkan)
 def w(name, cols, rows):
     with open(D / name, "w", newline="") as f:
