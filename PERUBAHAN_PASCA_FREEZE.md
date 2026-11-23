@@ -7,3 +7,5 @@ Freeze: commit 2210fbc, 2026-11-12 22:12 WIB. `strategy.py`, aturan di `config.j
 | 2026-11-12 (setelah freeze) | `.github/workflows/tick.yml`: jadwal `7 * * * *` -> `7,37 * * * *` | Run terjadwal GitHub sering tertunda hingga ~1,5 jam (terlihat di riwayat Actions), berisiko memproses candle 12h terlambat. Bot idempotent (1 candle = 1 eksekusi) sehingga pemicu ganda aman. | Tidak |
 | 2026-11-14 | `export_logs.py`: mode offline `LOG_FILE` | Membuat CSV dari `log_mentah.json` hasil ekspor tanpa akses jaringan | Tidak |
 | 2026-11-14 | `hitung_ulang.py`: `expected` pada metrik uptime dibatasi sampai log terakhir | Laporan sementara; sebelumnya dibagi seluruh 10 hari sehingga uptime tampak 20% | Tidak (hanya perhitungan laporan) |
+
+Catatan akhir (23 Nov 2026): tidak ada perubahan pada `strategy.py`, `api/`, `backtest.py`, maupun aturan di `config.json` sejak freeze. `python audit.py` memverifikasinya.
